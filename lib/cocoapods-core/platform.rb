@@ -45,11 +45,19 @@ module Pod
         @symbolic_name = input.name
         @deployment_target = input.deployment_target
       else
-        # Allow `Platform.new('macos')` to be equivalent to `Platform.macos`
-        if input == 'macos'
-          input = 'osx'
-        end
-        @symbolic_name = input.to_sym
+        input = input.to_s.downcase
+
+        name = case input
+               when 'macos'
+                 # Allow `Platform.new('macos')` to be equivalent to `Platform.macos`
+                 'osx'
+               when 'xros'
+                 # Compatibility with older references to 'xrOS'
+                 'visionos'
+               else
+                 input
+               end
+        @symbolic_name = name.to_sym
         target = target[:deployment_target] if target.is_a?(Hash)
         @deployment_target = Version.create(target)
       end
